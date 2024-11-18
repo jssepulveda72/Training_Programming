@@ -42,29 +42,34 @@ def Dificultad(RepsMax,Unidad):
         elif RepsMax in range(1,5):
             return 5
 
-def Series(Ejercicio,PatrondeMovimiento,dia):
+def Series(Ejercicio,PatrondeMovimiento,dia,intencion):
     
     if "Handstand" in PatrondeMovimiento or "Mobility" in PatrondeMovimiento:
-        return 2
-    else:
-        if dia in ["Miercoles","Martes"]:
-            return 1
-        else:
+        if intencion in ["Strenght","Endurance","Flag"]:
             return 2
+        else:
+            return 3
+    else:
+        if dia in ["Miercoles","Martes","Sabado"]:
+            return 2
+        else:
+            return 3
     
 
 def Escritor(Glosario,series):
     if Glosario.loc["Extra"] == 0:
         Escrito = """{} 
-    {}X{}\n""".format(Glosario.loc["Ejercicio"],
+    {}X{}{}\n""".format(Glosario.loc["Ejercicio"],
                   series,
-                  Glosario.loc["Repeticiones maximas"])
+                  Glosario.loc["Repeticiones maximas"],
+                  Glosario.loc["Unidad"][0])
     
     else:
         Escrito = """{} + {} Kg 
-    {}X{}\n""".format(Glosario.loc["Ejercicio"],Glosario.loc["Extra"],
+    {}X{}{}\n""".format(Glosario.loc["Ejercicio"],Glosario.loc["Extra"],
                   series,
-                  Glosario.loc["Repeticiones maximas"])
+                  Glosario.loc["Repeticiones maximas"],
+                  Glosario.loc["Unidad"][0])
     
     return Escrito
     
@@ -86,19 +91,19 @@ def VolumenEjercicio(Ejercicio,Repeticiones,Unidad,Palanca):
 def SumadeVolumen(VolumenEjercicio,patrondemovimiento,intencion):
     if patrondemovimiento == "One Arm Handstand":
         
-        VolumenPorMusculo["Deltoide"] += 0.2*VolumenEjercicio
-        VolumenPorMusculo["Escapula"] += 0.2*VolumenEjercicio
-        
-    elif patrondemovimiento in ["Mobility","Handstand"]:
-        
         VolumenPorMusculo["Deltoide"] += 0.1*VolumenEjercicio
         VolumenPorMusculo["Escapula"] += 0.1*VolumenEjercicio
         
+    elif patrondemovimiento in ["Mobility","Handstand"]:
+        
+        VolumenPorMusculo["Deltoide"] += 0.05*VolumenEjercicio
+        VolumenPorMusculo["Escapula"] += 0.05*VolumenEjercicio
+        
     elif patrondemovimiento in ["Pierna"]:
         
-        VolumenPorMusculo["Gluteos"] += 1*VolumenEjercicio
-        VolumenPorMusculo["Isquios"] += 1*VolumenEjercicio
-        VolumenPorMusculo["Cuadriceps"] += 1*VolumenEjercicio
+        VolumenPorMusculo["Gluteos"] += 0.8*VolumenEjercicio
+        VolumenPorMusculo["Isquios"] += 0.8*VolumenEjercicio
+        VolumenPorMusculo["Cuadriceps"] += 0.8*VolumenEjercicio
         
     elif patrondemovimiento == "Straight Arm Strenght":
         
@@ -219,7 +224,8 @@ for dia in Planeacion.columns:      #Desarrollar la rutina dia por dia
                               Ejercicio.loc["Unidad"], 
                               Ejercicio.loc["Palanca"])*Series(Ejercicio.loc["Ejercicio"], 
                                                                PatrondeMovimiento, 
-                                                               dia)
+                                                               dia,
+                                                               intencion)
         
         
         SumadeVolumen(VE, PatrondeMovimiento, intencion)
@@ -229,7 +235,8 @@ for dia in Planeacion.columns:      #Desarrollar la rutina dia por dia
         EjercicioStr = Escritor(Ejercicio,
                                 Series(Ejercicio.loc["Ejercicio"], 
                                        PatrondeMovimiento, 
-                                       dia))
+                                       dia,
+                                       intencion))
     
         ListadeEjercicios.append(EjercicioStr)
         
