@@ -40,11 +40,11 @@ def excersice_printing():
                 
                 for set in range(rutina.loc[excersice,"Sets"]):
                         with st.container():
-                            exer,reps,effort = st.columns([0.5,0.5,0.5],vertical_alignment="center")
+                            exer,reps = st.columns([0.5,0.5],vertical_alignment="center")
                             exer.checkbox(f"Set {set+1}",key=f"echeck {excersice}{set}")
                             reps.number_input("Reps",min_value=0,key=f"ejercicio {excersice}{set}",
                                               value=rutina.loc[excersice,"Reps"])
-                            effort.number_input("Esfuerzo",min_value=0,max_value=10,key=f"eejericio{excersice}{set}")
+                            #effort.number_input("Esfuerzo",min_value=0,max_value=10,key=f"eejericio{excersice}{set}")
 
 
 excersice_printing()
