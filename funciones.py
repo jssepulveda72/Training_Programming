@@ -32,9 +32,15 @@ def excersice_printing():
         rutina = rutina[rutina["Dia"] == select_day].set_index("Ejercicio")
         for excersice in rutina.index:
                 st.subheader(excersice)
+                try:
+                       prueba = range(rutina.loc[excersice,"Sets"])
+                except:
+                       print(rutina.loc[excersice,"Sets"])
+                       continue
+                
                 for set in range(rutina.loc[excersice,"Sets"]):
                         with st.container():
-                            exer,reps,effort,col1,col2,col3 = st.columns([0.5,0.5,0.5,1,1,1],vertical_alignment="center")
+                            exer,reps,effort = st.columns([0.5,0.5,0.5],vertical_alignment="center")
                             exer.checkbox(f"Set {set+1}",key=f"echeck {excersice}{set}")
                             reps.number_input("Reps",min_value=0,key=f"ejercicio {excersice}{set}",
                                               value=rutina.loc[excersice,"Reps"])
