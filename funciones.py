@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 
-Rutinas = pd.read_excel("Prueba.xlsx")
+Rutinas = pd.read_csv("Prueba.csv")
 
 st.set_page_config(layout="wide")
 

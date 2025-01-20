@@ -102,4 +102,4 @@ RutinasCiclos["Sets"] = RutinasCiclos["Sets"].astype("int")
 RutinasCiclos["Reps"] = RutinasCiclos["Reps"].astype("int")
 
 
-RutinasCiclos.to_excel("Prueba.xlsx")
+RutinasCiclos.to_csv("Prueba.csv")
