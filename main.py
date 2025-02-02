@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime
 from func import *
 
+__version__ = "0.1.0"
+
 st.set_page_config(layout="wide")
 
 conn = init_connection()
