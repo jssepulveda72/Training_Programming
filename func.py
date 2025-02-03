@@ -188,8 +188,16 @@ def planner_display(conn):
                         use_container_width=True,
                         hide_index=True)
             
+    contra = st.text_input("Password")
+
     if st.button("Terminar"):
-        create_plan(st.session_state.plan_semanal,conn)
+        if contra == st.secrets["password"]["pass"]:
+            create_plan(st.session_state.plan_semanal,conn)
+            st.success("Plan actualizado!!")
+            st.snow()
+        else:
+            st.balloons()
+
 
 
 def history_display():
