@@ -36,7 +36,7 @@ with train_display:
         index = None
     )
 
-    excersice_printing(st.session_state.hoy,conn)
+    excersice_printing_mobile(st.session_state.hoy,conn)
     
 
 
