@@ -124,63 +124,78 @@ def excersice_printing_mobile(dia,conn):
     query = f'SELECT bloque, ejercicio, series, repeticiones, unidad FROM plan_semanal WHERE dia = \'{dia}\' '
     columnas = ["bloque","ejercicio","series","repeticiones","unidad"]
 
-    numbers = dict()
-
     rutina = fetch_data(conn,query,columnas)
 
-    n_bloques = len(rutina["bloque"].unique())
-
-    ejer_per_block = rutina.loc[rutina["bloque"] == st.session_state.counter].reset_index()
-
-    n_ejer_per_block = len(ejer_per_block)
-
-    series = ejer_per_block["series"].unique()[0]
-
-    placeholder = st.empty()
-
-
-    with placeholder.container():
-
-        st.header(f"Super set {st.session_state.counter}")
-
-        for i in range(n_ejer_per_block):
-
-            ejercicio = ejer_per_block["ejercicio"][i]
-            repeticiones = ejer_per_block["repeticiones"][i]
-            unidad = ejer_per_block["unidad"][i]
-
-            st.subheader(ejercicio)
-            for serie in range(series):
-
-
-                st.checkbox(f"Serie {serie+1}", 
-                                    key = f"Serie {i}{serie+1}")
-
-                numbers[f"{ejercicio}"] = numbers.get(f"{ejercicio}",[]) + [st.number_input(f"{unidad}",
-                                                                            key=f"{ejercicio}{i}{serie}",
-                                                                            value=repeticiones)]
-
-    if st.session_state.counter < n_bloques:
-
-        if st.button("continuar"):
-            st.session_state.counter += 1
+    if rutina.empty:
+        st.title("Regalate 10.000 pasos.")
 
     else:
 
-        if st.button("Terminar", key=f"button{dia}"):
+
+        numbers = dict()
+
+        
+
+        n_bloques = len(rutina["bloque"].unique())
+
+        ejer_per_block = rutina.loc[rutina["bloque"] == st.session_state.counter].reset_index()
+
+        n_ejer_per_block = len(ejer_per_block)
+
+        series = ejer_per_block["series"].unique()[0]
+
+        placeholder = st.empty()
+
+
+        with placeholder.container():
+
+            st.header(f"Super set {st.session_state.counter}")
+
+            for i in range(n_ejer_per_block):
+
+                ejercicio = ejer_per_block["ejercicio"][i]
+                repeticiones = ejer_per_block["repeticiones"][i]
+                unidad = ejer_per_block["unidad"][i]
+
+                st.subheader(ejercicio)
+                for serie in range(series):
+
+
+                    st.checkbox(f"Serie {serie+1}", 
+                                        key = f"Serie {i}{serie+1}")
+
+                    numbers[f"{ejercicio}"] = numbers.get(f"{ejercicio}",[]) + [st.number_input(f"{unidad}",
+                                                                                key=f"{ejercicio}{i}{serie}",
+                                                                                value=repeticiones)]
+
+        if st.session_state.counter < n_bloques:
+
+            if st.button("continuar"):
+                st.session_state.counter += 1
+
+        else:
+
+            if st.button("Terminar", key=f"button{dia}"):
+                        
+                st.session_state.counter = 1
+                df = pd.DataFrame(dict([(key, pd.Series(value)) for key, value in numbers.items()]))
+                df = df.mean(axis=0,skipna=True)
                     
-            st.session_state.counter = 1
-            df = pd.DataFrame(dict([(key, pd.Series(value)) for key, value in numbers.items()]))
-            df = df.mean(axis=0,skipna=True)
-                
-                    
-            st.dataframe(df)
-            st.snow()
+                        
+                st.dataframe(df)
+                st.balloons()
 
 def planner_display(conn):
 
     query = 'SELECT * FROM ejercicios'
-    columnas = ["ejercicio","repeticiones maximas","unidad","descanso","intencion","patron de movimiento"]
+    columnas = ["ejercicio",
+                "repeticiones maximas",
+                "unidad",
+                "extra",
+                "unidad extra",
+                "patron de movimiento",
+                "disciplina",
+                "intencion"]
 
     ejercicios = fetch_data(conn,query,columnas)
 
@@ -189,9 +204,7 @@ def planner_display(conn):
 
         st.session_state.plan_semanal = pd.DataFrame({})
 
-    Patronesdemovimiento = ["One Arm Handstand", "Straight Arm Strenght", 
-                            "Bent Arm Strenght", "Handstand", "Pierna",
-                            "Mobility"]
+    Patronesdemovimiento = ejercicios["patron de movimiento"].unique()
 
     dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]
    
@@ -226,7 +239,7 @@ def planner_display(conn):
     df = ejercicios.loc[ejercicios["patron de movimiento"] == patron_de_movimiento]
 
 
-    result = st.dataframe(df["ejercicio"]
+    result = st.dataframe(df[["ejercicio","intencion"]]
                 ,hide_index=True,
                 use_container_width=True,
                 on_select="rerun",
