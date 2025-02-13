@@ -197,14 +197,16 @@ def planner_display(conn):
                 "disciplina",
                 "intencion"]
 
-    ejercicios = fetch_data(conn,query,columnas)
+    if "ejercicios" not in st.session_state:
+
+        st.session_state.ejercicios = fetch_data(conn,query,columnas)
 
 
     if "plan_semanal" not in st.session_state:
 
         st.session_state.plan_semanal = pd.DataFrame({})
 
-    Patronesdemovimiento = ejercicios["patron de movimiento"].unique()
+    Patronesdemovimiento = st.session_state.ejercicios["patron de movimiento"].unique()
 
     dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]
    
@@ -236,7 +238,7 @@ def planner_display(conn):
             step=1
         )
 
-    df = ejercicios.loc[ejercicios["patron de movimiento"] == patron_de_movimiento]
+    df = st.session_state.ejercicios.loc[st.session_state.ejercicios["patron de movimiento"] == patron_de_movimiento]
 
 
     result = st.dataframe(df[["ejercicio","intencion"]]
