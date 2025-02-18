@@ -4,6 +4,10 @@ import pandas as pd
 
 Rutinas = pd.read_csv("Prueba.csv")
 
+if "Rutinas" not in st.session_state:
+       st.session_state.Rutinas = Rutinas
+
+
 st.set_page_config(layout="wide")
 
 # Title of the app
@@ -26,7 +30,7 @@ select_day = st.sidebar.selectbox("Dia",["Lunes",
 
 st.header(select_week)
 
-def excersice_printing():
+def excersice_printing(Rutinas):
         st.header(select_day)
         rutina = Rutinas[Rutinas["Semana"] == select_week]
         rutina = rutina[rutina["Dia"] == select_day].set_index("Ejercicio")
@@ -47,71 +51,17 @@ def excersice_printing():
                             #effort.number_input("Esfuerzo",min_value=0,max_value=10,key=f"eejericio{excersice}{set}")
 
 
-excersice_printing()
+day_display, daframe_display = st.tabs(["Day","Table"])
 
+with day_display:
+    excersice_printing(st.session_state.Rutinas)
 
-
-
-
-
-
-
-
-
-
-
-""" # Input fields for reps, weight, and perceived effort
-reps = st.number_input("Reps", min_value=0)
-weight = st.number_input("Weight (kg)", min_value=0.0, step=0.5)
-effort = st.slider("Perceived Effort (1-10)", min_value=1, max_value=10)
-
-# Button to submit the data
-if st.button("Save Entry"):
-    # Create a dataframe to store the data
-    try:
-        # Attempt to load existing data from session state
-        training_data = st.session_state.training_data
-    except AttributeError:
-        # If it doesn't exist, initialize an empty dataframe
-        training_data = pd.DataFrame(columns=["Date", "Reps", "Weight", "Effort"])
-
-    # Append the new entry to the dataframe
-    new_entry = {
-        "Date": selected_date,
-        "Reps": reps,
-        "Weight": weight,
-        "Effort": effort,
-    }
-    training_data = training_data.append(new_entry, ignore_index=True)
-
-    # Save the updated dataframe back to session state
-    st.session_state.training_data = training_data
-
-    # Provide feedback to the user
-    st.success("Entry saved!")
-
-# Display the training data in a table if it exists
-if 'training_data' in st.session_state:
-    st.subheader("Training Data")
-    st.dataframe(st.session_state.training_data) """
-
-
-
-
-""" st.header(select_week)
-with exer:
-    st.header(select_day)
-    for i in ejercicios[select_day]:
-        st.markdown(i)
-
-
-
-with reps:
-    st.header("")
-    for i in range(len(ejercicios[select_day])):
-       st.number_input("Reps", min_value=0, key=f"ejercicio {i}")
-
-with effort:
-   st.header("")
-   for i in range(len(ejercicios[select_day])):
-       st.slider("Perceived Effort (1-10)", min_value=1, max_value=10, key=f"eejercicio {i}")  """ 
+with daframe_display:
+    day_table = st.session_state.Rutinas
+    day_table = day_table.loc[(day_table["Dia"] == select_day) & (day_table["Semana"] == select_week),
+                               "Ejercicio":"Reps"]
+    actual_table = st.data_editor(day_table,use_container_width = True)
+    if st.button("Guardar"):
+          st.session_state.Rutinas.loc[(st.session_state.Rutinas["Dia"] == select_day) 
+                                       & (st.session_state.Rutinas["Semana"] == select_week),
+                               "Ejercicio":"Reps"] = actual_table

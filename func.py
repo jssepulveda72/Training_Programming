@@ -56,18 +56,20 @@ def excersice_printing_desktop(dia, conn):
     query = f'SELECT bloque, ejercicio, series, repeticiones, unidad FROM plan_semanal WHERE dia = \'{dia}\' '
     columnas = ["bloque","ejercicio","series","repeticiones","unidad"]
 
-    rutina = fetch_data(conn,query,columnas)
+    if "rutina" not in st.session_state:
 
-    if rutina.empty:
+        st.session_state.rutina = fetch_data(conn,query,columnas)
+
+    if st.session_state.rutina.empty:
         st.title("Regalate 10.000 pasos.")
 
     else:
 
         numbers = dict()
 
-        for bloque in rutina["bloque"].unique():
+        for bloque in st.session_state.rutina["bloque"].unique():
             
-            ejer_per_block = rutina.loc[rutina["bloque"] == bloque].reset_index()
+            ejer_per_block = st.session_state.rutina.loc[st.session_state.rutina["bloque"] == bloque].reset_index()
             n_ejer_per_block = len(ejer_per_block)
 
             series = ejer_per_block["series"].unique()[0]
@@ -124,9 +126,11 @@ def excersice_printing_mobile(dia,conn):
     query = f'SELECT bloque, ejercicio, series, repeticiones, unidad FROM plan_semanal WHERE dia = \'{dia}\' '
     columnas = ["bloque","ejercicio","series","repeticiones","unidad"]
 
-    rutina = fetch_data(conn,query,columnas)
+    if "rutina" not in st.session_state:
+        
+        st.session_state.rutina = fetch_data(conn,query,columnas)
 
-    if rutina.empty:
+    if st.session_state.rutina.empty:
         st.title("Regalate 10.000 pasos.")
 
     else:
@@ -136,9 +140,9 @@ def excersice_printing_mobile(dia,conn):
 
         
 
-        n_bloques = len(rutina["bloque"].unique())
+        n_bloques = len(st.session_state.rutina["bloque"].unique())
 
-        ejer_per_block = rutina.loc[rutina["bloque"] == st.session_state.counter].reset_index()
+        ejer_per_block = st.session_state.rutina.loc[st.session_state.rutina["bloque"] == st.session_state.counter].reset_index()
 
         n_ejer_per_block = len(ejer_per_block)
 
@@ -185,6 +189,8 @@ def excersice_printing_mobile(dia,conn):
                 st.dataframe(df)
                 st.balloons()
 
+
+
 def planner_display(conn):
 
     query = 'SELECT * FROM ejercicios'
@@ -206,39 +212,57 @@ def planner_display(conn):
 
         st.session_state.plan_semanal = pd.DataFrame({})
 
-    Patronesdemovimiento = st.session_state.ejercicios["patron de movimiento"].unique()
+    def table_change():
 
-    dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]
-   
-    cols = st.columns(4)
+        st.session_state.plan_semanal = edited_plan
+
+    cols = st.columns(3)
+    
+    disciplinas = st.session_state.ejercicios["disciplina"].unique()
 
     with cols[0]:
+        disciplina = st.selectbox(
+            "Disciplina",
+            disciplinas
+        )
+
+
+    Patronesdemovimiento = st.session_state.ejercicios.loc[st.session_state.ejercicios["disciplina"] == disciplina,
+                                                           "patron de movimiento"].unique()
+
+    with cols[1]:
         patron_de_movimiento = st.selectbox(
             "Patron de movimiento",
             Patronesdemovimiento
         )
 
-    with cols[1]:
+
+
+    dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]
+   
+    with cols[2]:
         dia_selector = st.selectbox(
             "Dia",
             dias
         )
 
-    with cols[2]:
-        series_selector = st.number_input(
-            "Series",
-            value=3,
-            step=1
-        )
+    # with cols[3]:
+    #     series_selector = st.number_input(
+    #         "Series",
+    #         value=3,
+    #         step=1
+    #     )
 
-    with cols[3]:
-        bloque_selector = st.number_input(
-            "Super-set",
-            value=1,
-            step=1
-        )
+    # with cols[4]:
+    #     bloque_selector = st.number_input(
+    #         "Super-set",
+    #         value=1,
+    #         step=1
+    #     )
 
-    df = st.session_state.ejercicios.loc[st.session_state.ejercicios["patron de movimiento"] == patron_de_movimiento]
+    df = st.session_state.ejercicios.loc[(st.session_state.ejercicios["patron de movimiento"] == patron_de_movimiento)
+                                         &
+                                         (st.session_state.ejercicios["disciplina"] == disciplina)]
 
 
     result = st.dataframe(df[["ejercicio","intencion"]]
@@ -255,8 +279,8 @@ def planner_display(conn):
                                                     ]]
 
     aux_df["dia"] = [dia_selector]
-    aux_df["bloque"] = [bloque_selector]
-    aux_df["series"] = [series_selector]
+    aux_df["bloque"] = [1]
+    aux_df["series"] = [3]
 
     aux_df = aux_df.iloc[:,[-3,-2,0,-1,1,2]]
 
@@ -265,9 +289,29 @@ def planner_display(conn):
         st.session_state.plan_semanal = pd.concat([st.session_state.plan_semanal,
                                                 aux_df],ignore_index=True)
 
-    st.dataframe(st.session_state.plan_semanal,
-                        use_container_width=True,
-                        hide_index=True)
+    edited_plan = st.data_editor(st.session_state.plan_semanal,
+                                column_config ={
+                                    "dia" : st.column_config.SelectboxColumn(
+                                        "dia",
+                                        options = dias,
+                                        required = True
+                                    ),
+                                    "bloque" : st.column_config.NumberColumn(
+                                        "bloque",
+                                        step =1
+                                    ),
+                                    "series" : st.column_config.NumberColumn(
+                                        "series",
+                                        step = 1 
+                                    ),
+                                    "repeticiones maximas" : st.column_config.NumberColumn(
+                                        "repeticiones maximas",
+                                    )
+                                },
+                                #on_change = table_change(),
+                                use_container_width = True,
+                                hide_index = True,
+                                disabled = ["ejercicio", "unidad"])
             
     contra = st.text_input("Password")
 
