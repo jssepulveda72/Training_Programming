@@ -114,6 +114,16 @@ def excersice_printing_desktop(dia, conn):
             st.dataframe(df)
             st.snow()    
 
+def on_change_sb(conn):
+
+    st.session_state.hoy = st.session_state.new_day
+    query = f'SELECT bloque, ejercicio, series, repeticiones, unidad FROM plan_semanal WHERE dia = \'{st.session_state.hoy}\' '
+    columnas = ["bloque","ejercicio","series","repeticiones","unidad"]
+
+    st.session_state.rutina = fetch_data(conn,query,columnas)
+
+    
+
 
 def excersice_printing_mobile(dia,conn):
 
@@ -216,7 +226,7 @@ def planner_display(conn):
 
         st.session_state.plan_semanal = edited_plan
 
-    cols = st.columns(3)
+    cols = st.columns(5)
     
     disciplinas = st.session_state.ejercicios["disciplina"].unique()
 
@@ -246,19 +256,19 @@ def planner_display(conn):
             dias
         )
 
-    # with cols[3]:
-    #     series_selector = st.number_input(
-    #         "Series",
-    #         value=3,
-    #         step=1
-    #     )
+    with cols[3]:
+         series_selector = st.number_input(
+             "Series",
+             value=3,
+             step=1
+         )
 
-    # with cols[4]:
-    #     bloque_selector = st.number_input(
-    #         "Super-set",
-    #         value=1,
-    #         step=1
-    #     )
+    with cols[4]:
+         bloque_selector = st.number_input(
+             "Super-set",
+             value=1,
+             step=1
+         )
 
     df = st.session_state.ejercicios.loc[(st.session_state.ejercicios["patron de movimiento"] == patron_de_movimiento)
                                          &
@@ -279,8 +289,8 @@ def planner_display(conn):
                                                     ]]
 
     aux_df["dia"] = [dia_selector]
-    aux_df["bloque"] = [1]
-    aux_df["series"] = [3]
+    aux_df["bloque"] = [bloque_selector]
+    aux_df["series"] = [series_selector]
 
     aux_df = aux_df.iloc[:,[-3,-2,0,-1,1,2]]
 
@@ -316,7 +326,9 @@ def planner_display(conn):
     contra = st.text_input("Password")
 
     if st.button("Terminar"):
+        
         if contra == st.secrets["password"]["pass"]:
+            st.session_state.plan_semanal = edited_plan
             create_plan(st.session_state.plan_semanal,conn)
             st.success("Plan actualizado!!")
             st.snow()

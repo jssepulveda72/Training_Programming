@@ -18,22 +18,21 @@ if "hoy" not in st.session_state:
     st.session_state.hoy = dias[hoy_index]
 
 
-
 train_display, planning_section, excersice_glosary = st.tabs(["Entrenamiento",
                                                                "Planeador semanal",
                                                                "Glosario de ejercicios"])
 
-def on_change_sb():
-    st.session_state.hoy = st.session_state.new_day
+
+
 
 with train_display:
-    st.selectbox(
-        "Dia", 
-        options=dias,
-        key = 'new_day',
-        on_change = on_change_sb,
-        placeholder="Elegir dia",
-        index = None
+    nuevo_dia = st.selectbox(
+                "Dia", 
+                options=dias,
+                key = 'new_day',
+                on_change = on_change_sb,
+                placeholder="Elegir dia",
+                index = None
     )
 
     excersice_printing_mobile(st.session_state.hoy,conn)
