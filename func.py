@@ -386,3 +386,24 @@ def history_display():
     if frame.selection["rows"]:
 
         plot_line()
+
+
+
+def side_display():
+    st.subheader("Ejercicios de descanso")
+    rutinas = {
+        "Pancake & Middle split" : ["Seated good mornings","Standing pancake to bent legs","Elevated pancake goodmornig","Single leg foot elevated compression",
+                                    "Weighted butterflies","Side split push ups","KB sidesplit abductions","Pancake goodmornings","Side split hold"],
+        "Pancake & Front split" : ["Couch stretch","Half kneeling split","Feet elevated hamstring  stretch","Feet elevated pidgeon pose","Standing pike pose to bent knees",
+                                    "Standing pike pose","Elevated pancake good morning","Pancake good mornings","Front split hold"],
+        "Middle & Front split" : ["Couch stretch","Half kneeling split","Feet elevated hamstring stretch","Feet elevated pidgeon pose","Weighted butterflies",
+                                    "Side split push ups","KB side split abductions","Front split hold","Side split hold"],
+        "Bridge" : ["Band shoulder pass through","Semi bridge","Pull over","Cobra push up","Back bridge","Shoulder bridge push ups","Hanging side bend",
+                    "Chest floor abductions","Thoracic rotations"]
+        }
+
+    df = pd.DataFrame(rutinas)
+    st.dataframe(df,
+                hide_index=True,
+                use_container_width=True,
+                )

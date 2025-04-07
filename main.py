@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime,timedelta,timezone
 from func import *
 
 __version__ = "0.1.0"
@@ -11,16 +11,17 @@ conn = init_connection()
 
 st.title("Aplicacion de entrenamiento")
 
-hoy_index = datetime.today().weekday()
+hoy_index = datetime.today().astimezone(timezone(timedelta(hours=-5))).weekday()
 dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"]
 
 if "hoy" not in st.session_state:
     st.session_state.hoy = dias[hoy_index]
 
 
-train_display, planning_section, excersice_glosary = st.tabs(["Entrenamiento",
-                                                               "Planeador semanal",
-                                                               "Glosario de ejercicios"])
+train_display, side_routines, planning_section, excersice_glosary = st.tabs(["Entrenamiento",
+                                                                            "Rutinas de descanso",
+                                                                            "Planeador semanal",
+                                                                            "Glosario de ejercicios"])
 
 
 
@@ -36,6 +37,9 @@ with train_display:
     )
 
     excersice_printing_mobile(st.session_state.hoy,conn)
+
+with side_routines:
+    side_display()
     
 
 
